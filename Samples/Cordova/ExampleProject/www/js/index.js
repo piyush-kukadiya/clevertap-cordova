@@ -302,6 +302,7 @@ function setupButtons() {
         ["push Inbox Notification Viewed Event For Id", () => CleverTap.pushInboxNotificationViewedEventForId("messageId")],
         ["push Inbox Notification Clicked Event For Id", () => CleverTap.pushInboxNotificationClickedEventForId("messageId")],
         ["dismiss Inbox", () => CleverTap.dismissInbox()],
+        ["fetch Inbox", () => CleverTap.fetchInbox(result => log("fetchInbox success: " + result))],
 
         ["title","User History"],
         ["event GetFirstTime - foo", () => CleverTap.getUserEventLog("foo", eventLog => log("foo event first time is " + eventLog.firstTime))],
@@ -337,6 +338,10 @@ function setupButtons() {
         ["Push Display Unit Clicked", () => {
             let unitId = prompt("Please enter the unitID")
             CleverTap.pushDisplayUnitClickedEventForID(unitId)
+        }],
+        ["Push Display Unit Element Clicked", () => {
+            let unitId = prompt("Please enter the unitID")
+            CleverTap.pushDisplayUnitElementClickedEventForID(unitId, { "wzrk_element_id": "btn_01" })
         }],
         ["Push Display Unit Viewed", () => {
             let unitId = prompt("Please enter the unitID")

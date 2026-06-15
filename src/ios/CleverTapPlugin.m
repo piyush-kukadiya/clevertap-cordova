@@ -1210,10 +1210,22 @@ static NSMutableDictionary *allVariables;
 }
 
 /**
- Dismisses Appinbox 
+ Dismisses Appinbox
  */
 - (void)dismissInbox:(CDVInvokedUrlCommand *)command {
     [clevertap dismissAppInbox];
+}
+
+/**
+ Manually triggers an inbox refresh and invokes the callback with success/failure result.
+ */
+- (void)fetchInbox:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        [clevertap fetchInboxWithCallback:^(BOOL success) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:success];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    }];
 }
 
 /**
@@ -1312,10 +1324,21 @@ static NSMutableDictionary *allVariables;
 }
 
 - (void)pushDisplayUnitClickedEventForID:(CDVInvokedUrlCommand *)command {
-    
+
     [self.commandDelegate runInBackground:^{
         NSString *unitID = [command argumentAtIndex:0];
         [clevertap recordDisplayUnitClickedEventForID:unitID];
+    }];
+}
+
+- (void)pushDisplayUnitElementClickedEventForID:(CDVInvokedUrlCommand *)command {
+    [self.commandDelegate runInBackground:^{
+        NSString *unitID = [command argumentAtIndex:0];
+        NSDictionary *additionalProperties = [command argumentAtIndex:1];
+        if (unitID != nil && [unitID isKindOfClass:[NSString class]]) {
+            NSDictionary *props = ([additionalProperties isKindOfClass:[NSDictionary class]]) ? additionalProperties : nil;
+            [clevertap recordDisplayUnitElementClickedEventForID:unitID additionalProperties:props];
+        }
     }];
 }
 
@@ -1471,7 +1494,7 @@ static NSMutableDictionary *allVariables;
 
 - (void)setLibrary {
     NSString *libName = @"Cordova";
-    int libVersion = 50000;
+    int libVersion = 51000;
     [clevertap setLibrary:libName];
     [clevertap setCustomSdkVersion:libName version:libVersion];
 }

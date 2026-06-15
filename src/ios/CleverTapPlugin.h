@@ -410,9 +410,14 @@ Push Token Changes other than FCM
 - (void)markReadInboxMessagesForIds:(CDVInvokedUrlCommand *)command;
 
 /**
- Dismisses Appinbox 
+ Dismisses Appinbox
  */
 - (void)dismissInbox:(CDVInvokedUrlCommand *)command;
+
+/**
+ Manually triggers an inbox refresh and invokes the callback with success/failure result.
+ */
+- (void)fetchInbox:(CDVInvokedUrlCommand *)command;
 
 /**
  This method Marks Inbox Notification Viewed for Given Message Id
@@ -445,6 +450,11 @@ Push Token Changes other than FCM
  This method is called to record Click on Display Unit
  */
 - (void)pushDisplayUnitClickedEventForID:(CDVInvokedUrlCommand *)command;
+
+/**
+ This method records a Notification Clicked event for a specific element within a Display Unit.
+ */
+- (void)pushDisplayUnitElementClickedEventForID:(CDVInvokedUrlCommand *)command;
 
 # pragma mark - Feature Flags & Product Config
 

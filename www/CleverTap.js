@@ -549,6 +549,10 @@ CleverTap.prototype.pushInboxNotificationClickedEventForId = function (messageId
      cordova.exec(null, null, "CleverTapPlugin", "pushInboxNotificationClickedEventForId", [messageId]);
 }
 
+CleverTap.prototype.fetchInbox = function (successCallback) {
+    cordova.exec(successCallback, null, "CleverTapPlugin", "fetchInbox", []);
+}
+
 /*******************
  * In-App Controls
  ******************/
@@ -593,6 +597,10 @@ CleverTap.prototype.pushDisplayUnitViewedEventForID = function(unitId){
 
 CleverTap.prototype.pushDisplayUnitClickedEventForID = function(unitId){
 	cordova.exec(null, null, "CleverTapPlugin", "pushDisplayUnitClickedEventForID", [unitId]);
+}
+
+CleverTap.prototype.pushDisplayUnitElementClickedEventForID = function(unitId, additionalProperties){
+	cordova.exec(null, null, "CleverTapPlugin", "pushDisplayUnitElementClickedEventForID", [unitId, additionalProperties]);
 }
 
 /****************************

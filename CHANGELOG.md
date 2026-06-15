@@ -1,5 +1,25 @@
 Change Log
 ==========
+Version 5.1.0 *(June 15 2026)*
+-------------------------------------------
+**What's new**
+* **[Android Platform]**
+    * Supports [CleverTap Android SDK v8.3.0](https://github.com/CleverTap/clevertap-android-sdk/blob/master/docs/CTCORECHANGELOG.md#version-830-june-2026).
+
+* **[iOS Platform]**
+    * Supports [CleverTap iOS SDK v7.7.1](https://github.com/CleverTap/clevertap-ios-sdk/blob/master/CHANGELOG.md#version-771-june-04-2026).
+
+**API changes**
+* **[Android and iOS Platform]**
+    * Adds new `fetchInbox(successCallback)` API to trigger an on-demand App Inbox refresh from the server. The optional callback fires with `true` on success or `false` if the request was throttled (once per 5 minutes), session-disabled, or failed.
+    * Adds new `pushDisplayUnitElementClickedEventForID(unitId, additionalProperties)` API to record a Notification Clicked event for a specific interactive element within a Native Display unit, merging caller-supplied `wzrk_*` attribution fields with the unit's cached campaign data.
+
+**Bug Fixes**
+* **[iOS Platform]**
+    * Fixes a bug where server-side In-App evaluation IDs were being duplicated in UserDefaults.
+    * Fixes a bug where apps were freezing when In-Apps were being shown in low network conditions.
+    * Fixes a crash in the In-App evaluation manager that could corrupt NSUserDefaults.
+
 Version 5.0.0 *(April 30 2026)*
 -------------------------------------------
 **What's new**

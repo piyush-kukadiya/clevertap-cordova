@@ -72,6 +72,19 @@ function handleUserAction(item: ListItem) {
         'MSG-push': false, // Disable push notifications
       };
       clevertap.profileSet(profileUpdate);
+      break;
+
+    // inbox
+    case UserActions.FetchInbox:
+      (clevertap as any).fetchInbox((result: boolean) => {
+        console.log('fetchInbox result: ' + result);
+      });
+      break;
+
+    // native display
+    case UserActions.PushDisplayUnitElementClickedEventForID:
+      (clevertap as any).pushDisplayUnitElementClickedEventForID('your_unit_id', { wzrk_element_id: 'btn_01' });
+      break;
   }
 }
 

@@ -25,9 +25,6 @@
         <param name="ios-package" value="CDVGestureHandler" />
         <param name="onload" value="true" />
     </feature>
-    <feature name="CleverTapPlugin">
-        <param name="ios-package" value="CleverTapPlugin" />
-    </feature>
     <name>ExampleProject</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
@@ -43,6 +40,7 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <resource-file src="assets/templates.json" target="templates.json" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <preference name="AllowInlineMediaPlayback" value="false" />
@@ -53,8 +51,8 @@
     <preference name="SuppressesLongPressGesture" value="false" />
     <preference name="Suppresses3DTouchGesture" value="false" />
     <preference name="AndroidXEnabled" value="true" />
-    <preference name="android-targetSdkVersion" value="32" />
-    <preference name="android-maxSdkVersion" value="32" />
-    <preference name="android-minSdkVersion" value="21" />
+    <preference name="android-targetSdkVersion" value="35" />
+    <preference name="android-maxSdkVersion" value="35" />
+    <preference name="android-minSdkVersion" value="23" />
     <preference name="GradlePluginGoogleServicesEnabled" value="true" />
 </widget>

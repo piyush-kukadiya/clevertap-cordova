@@ -14,8 +14,12 @@ const data = {
             title:'Record Event With Properties'
         },
         {
-            id:UserActions.EventRecordCharged,
+            userAction:UserActions.EventRecordCharged,
             title:'Record Charged Event'
+        },
+        {
+            userAction:UserActions.PushDisplayUnitElementClickedEventForID,
+            title:'Push Display Unit Element Clicked'
         }
 ]
 

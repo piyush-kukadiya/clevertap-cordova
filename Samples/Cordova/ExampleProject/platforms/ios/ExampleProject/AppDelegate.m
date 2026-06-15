@@ -19,13 +19,11 @@
 
 #import "AppDelegate.h"
 #import "MainViewController.h"
-#import "CleverTapPluginCustomTemplates.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary<UIApplicationLaunchOptionsKey, id> *)launchOptions
 {
-    [CleverTapPluginCustomTemplates registerCustomTemplates:@"templates", nil];
     self.viewController = [[MainViewController alloc] init];
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }

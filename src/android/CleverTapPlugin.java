@@ -17,6 +17,7 @@ import android.util.Log;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
+import com.clevertap.android.sdk.FetchInboxCallback;
 import com.clevertap.android.sdk.PushPermissionResponseListener;
 import com.clevertap.android.sdk.inapp.CTInAppNotification;
 import com.clevertap.android.sdk.inapp.CTLocalInApp;
@@ -107,7 +108,7 @@ public class CleverTapPlugin extends CordovaPlugin implements SyncListener, InAp
         cleverTap.registerPushPermissionNotificationResponseListener(this);
 
         String libName = "Cordova";
-        int libVersion = 50000;
+        int libVersion = 51000;
         cleverTap.setLibrary(libName);
         cleverTap.setCustomSdkVersion(libName, libVersion);
 
@@ -1015,6 +1016,25 @@ public class CleverTapPlugin extends CordovaPlugin implements SyncListener, InAp
         });
     }
 
+    private void fetchInbox(CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(() -> {
+            cleverTap.fetchInbox(success -> {
+                sendPluginResult(callbackContext, Status.OK, success);
+            });
+        });
+    }
+
+    private void pushDisplayUnitElementClickedEventForID(JSONArray args, CallbackContext callbackContext) {
+        executeWithArgs(args, callbackContext, (arguments) -> {
+            final String unitId = arguments.getString(0);
+            final JSONObject jsonProps = arguments.getJSONObject(1);
+            final HashMap<String, Object> additionalProperties = toMap(jsonProps);
+            cordova.getThreadPool().execute(() -> {
+                cleverTap.pushDisplayUnitElementClickedEventForID(unitId, additionalProperties);
+                sendPluginResult(callbackContext, Status.NO_RESULT);
+            });
+        });
+    }
 
     private void isFeatureFlagInitialized(CallbackContext callbackContext) {
         cordova.getThreadPool().execute(() -> {
@@ -1744,6 +1764,9 @@ public class CleverTapPlugin extends CordovaPlugin implements SyncListener, InAp
             case PUSH_INBOX_NOTIFICATION_CLICKED_EVENT_FOR_ID:
                 pushInboxNotificationClickedEventForId(args, callbackContext);
                 return true;
+            case FETCH_INBOX:
+                fetchInbox(callbackContext);
+                return true;
             case GET_ALL_DISPLAY_UNITS:
                 getAllDisplayUnits(callbackContext);
                 return true;
@@ -1755,6 +1778,9 @@ public class CleverTapPlugin extends CordovaPlugin implements SyncListener, InAp
                 return true;
             case PUSH_DISPLAY_UNIT_CLICKED_EVENT_FOR_ID:
                 pushDisplayUnitClickedEventForId(args, callbackContext);
+                return true;
+            case PUSH_DISPLAY_UNIT_ELEMENT_CLICKED_EVENT_FOR_ID:
+                pushDisplayUnitElementClickedEventForID(args, callbackContext);
                 return true;
             case IS_FEATURE_FLAG_INITIALIZED:
                 isFeatureFlagInitialized(callbackContext);
