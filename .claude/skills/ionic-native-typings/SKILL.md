@@ -98,19 +98,22 @@ methodName(name: string): Promise<any> {
 
 ## Mapping `www/CleverTap.js` → typings
 
-1. **Drop the success callback.** In the Cordova plugin a getter looks like
-   `CleverTap.prototype.foo = function (arg, successCallback) { cordova.exec(successCallback, …) }`.
-   In the typings the callback **disappears** — the value comes back via the returned `Promise`.
-   (Confirmed in the live file: `getCleverTapID()`, `profileGetProperty(propertyName)`, and
-   `variants()` are all callback-less `Promise<any>`.)
+1. **Parameters come from the `cordova.exec` args array — not the JS function signature.** A method
+   is `CleverTap.prototype.foo = function (arg, successCallback) { cordova.exec(successCallback, errorCb, "CleverTapPlugin", "foo", [arg]) }`.
+   The typings params are exactly the entries in that **`[ … ]` array** (here `arg`); the success/error
+   callbacks (the 1st/2nd `cordova.exec` args) are NOT params — they collapse into the returned
+   `Promise`. (Confirmed: `getCleverTapID()`, `profileGetProperty(propertyName)`, `variants()` are all
+   callback-less `Promise<any>`; `discardInAppNotifications` passes `[dismissInAppIfVisible === true]`
+   → it has one param.)
 2. **Mirror the method name exactly** — it is the `cordova.exec` action string and the
    `pluginRef`'s method; a typo means the call won't reach native.
 3. **Type the remaining args** JS → TS: `string` / `number` / `boolean`; an object → `any`
    (or a named interface if one already exists in the file); an array → `any[]`. Return is always
    `Promise<any>`.
-4. **Deprecations:** if the plugin removed/deprecated a method, mark the typings method with
-   `@deprecated <reason / replacement>` in its JSDoc — do NOT delete it (the file already keeps
-   deprecated entries like the old attribution-id getters).
+4. **Removed vs deprecated:** if a method is **gone** from `www/CleverTap.js`, **delete** it from the
+   typings (see "Reconciling" below). If it's still present but documented as deprecated, KEEP it and
+   add `@deprecated <reason / replacement>` to its JSDoc (the file keeps such entries, e.g. the old
+   attribution-id getters).
 
 ### Worked examples
 
@@ -151,14 +154,45 @@ recordEventWithName(eventName: string): Promise<any> {
 }
 ```
 
+## Reconciling cordova ↔ typings (add / update / remove)
+
+This is **full automation**: apply every change you can confidently derive and record it — the human
+reviews the PR. Reserve flagging for cases you genuinely can't resolve.
+
+**Updating an existing method (signature drift).** If a method exists in both but the cordova
+exec-args differ from the typings signature, update the typings to match. Newly-added trailing params
+become **optional** (`?`). Example — cordova added `dismissInAppIfVisible`:
+```ts
+// before
+@Cordova()
+discardInAppNotifications(): Promise<any> { return; }
+// after
+/**
+ * Clears pending In-App notifications.
+ * @param {boolean} dismissInAppIfVisible - also dismiss a currently-visible In-App.
+ * @returns {Promise<any>}
+ */
+@Cordova()
+discardInAppNotifications(dismissInAppIfVisible?: boolean): Promise<any> { return; }
+```
+
+**Removed from cordova.** If a method is in the typings but no longer in `www/CleverTap.js`, **delete
+it** (method + its JSDoc) — full parity with the plugin; the PR review is the gate. **Guard:** only
+delete when the name is genuinely gone — if it merely reappears under a different casing/rename, do
+NOT delete; flag it instead.
+
+**Only flag when genuinely uncertain.** If you can't confidently type a param, or a same-name /
+different-casing near-duplicate exists, make a best-effort edit if sensible and record it for the
+reviewer rather than guessing wildly.
+
 ## Checklist (per method)
 
-- [ ] Added to `src/@awesome-cordova-plugins/plugins/clevertap/index.ts` (the only file to touch).
-- [ ] Method name matches `www/CleverTap.js` exactly.
-- [ ] `@Cordova()` (bare) + returns `Promise<any>` + body is `return;`.
-- [ ] Success-callback param dropped; other args typed.
-- [ ] JSDoc with `@param`/`@returns`; `@deprecated` kept where applicable.
-- [ ] Placed under the matching banner section.
+- [ ] Edited only `src/@awesome-cordova-plugins/plugins/clevertap/index.ts`.
+- [ ] **Added** missing methods; **updated** drifted signatures (exec-args; new trailing params `?`);
+      **removed** methods gone from cordova (guard against casing/rename false positives).
+- [ ] Method name matches `www/CleverTap.js` exactly; params from the `cordova.exec` args array.
+- [ ] `@Cordova()` (bare) + returns `Promise<any>` + body is `return;`; JSDoc `@param`/`@returns`.
+- [ ] Placed under the matching banner section; imports / `@Plugin` / class decl untouched.
 - [ ] PR #1 opened against `CleverTap/ionic-native` `master`; upstream PR left as the human step.
 
 ## Common mistakes
@@ -172,8 +206,11 @@ recordEventWithName(eventName: string): Promise<any> {
 ❌ Editing the `@Plugin` block, imports, or `declare let clevertap` to add a method
 ✅ Only add methods inside the class body
 
-❌ Deleting a method the plugin deprecated
-✅ Keep it, add `@deprecated` to its JSDoc
+❌ Leaving a method that no longer exists in the cordova plugin
+✅ Delete it (full parity) — but only when the name is genuinely gone, not a casing/rename variant
+
+❌ Skipping a method whose signature changed just because the name already exists
+✅ Update the typings signature to match cordova's exec-args (new trailing params optional)
 
 ❌ Opening the upstream PR via automation
 ✅ Automation opens PR #1 into the fork; a maintainer opens the upstream PR by hand
